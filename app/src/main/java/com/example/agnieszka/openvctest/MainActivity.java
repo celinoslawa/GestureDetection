@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mRgbaF;
     Mat mRgbaT;
     Mat mGray;
+    Mat mCanny;
+    static{
+        System.loadLibrary("MyOpencvLibs");
+    }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -116,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mRgbaF = new Mat(height, width, CvType.CV_8UC4);
         mRgbaT = new Mat(width, width, CvType.CV_8UC4);
         mGray = new Mat(height,width, CvType.CV_8UC1);
+        mCanny = new Mat(height,width, CvType.CV_8UC1);
     }
 
     //destroy image data when you stop camera preview
@@ -129,13 +134,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mRgba = inputFrame.rgba();
         Imgproc.cvtColor(mRgba, mGray,Imgproc.COLOR_RGB2GRAY);
         Imgproc.blur(mGray, mGray, new Size(3,3));
-        Imgproc.Canny(mGray, mGray, 30, 90);
+        OpencvNativeClass.cannyDetect(mGray.getNativeObjAddr(), mCanny.getNativeObjAddr());
+        //Imgproc.Canny(mGray, mGray, 30, 90);
         // Rotate mRgba 90 degrees
        // Core.transpose(mRgba, mRgbaT);
        // Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
         //Core.flip(mRgbaF, mRgba, 1 );
 
-        return mGray; // This function must return
+        return mCanny; // This function must return
     }
 
 }
