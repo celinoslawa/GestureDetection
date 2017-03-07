@@ -25,6 +25,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -44,14 +45,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     // Used in Camera selection from menu (when implemented)
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
+    public double average;
 
-    // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
     Mat mRgba;
     Mat mHSV;
     Mat mHist;
     Mat mGray;
     Mat mCanny;
     Mat mTthres;
+    Mat foreground;
+
+    List<MatOfPoint> contours;
 
 
     static{
@@ -132,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mGray = new Mat(height,width, CvType.CV_8UC1);
         mCanny = new Mat(height,width, CvType.CV_8UC1);
         mTthres = new Mat(height,width, CvType.CV_8UC1);
+        foreground = new Mat(mRgba.size(), CvType.CV_32SC1, new Scalar(255, 255, 255));
+        contours = new ArrayList<MatOfPoint>();
     }
 
     //destroy image data when you stop camera preview
@@ -139,14 +145,40 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mRgba.release();
     }
 
+    public Mat backgroundRemove(Mat frame){
+        Imgproc.cvtColor(frame, mHSV,Imgproc.COLOR_BGR2HSV);
+        List<Mat> hsvMat = new ArrayList<>();
+        Core.split(mHSV, hsvMat);
+        MatOfInt histRange = new MatOfInt(180);
+        Imgproc.calcHist(hsvMat, new MatOfInt(0), new Mat(), mHist, histRange, new MatOfFloat(0, 179));
+        average = 0;
+        for (int h = 0; h < 180; h++)
+        {
+            // for each bin, get its value and multiply it for the corresponding
+            // hue
+            average += (mHist.get(h, 0)[0] * h);
+        }
+        average = average / mHSV.size().height / mHSV.size().width;
+        Imgproc.threshold(hsvMat.get(0), mTthres,average, 179.0, Imgproc.THRESH_BINARY );
+        Imgproc.blur(mTthres, mTthres, new Size(5, 5));
+        Imgproc.dilate(mTthres, mTthres, new Mat(), new Point(-1, -1), 1);
+        Imgproc.erode(mTthres, mTthres, new Mat(), new Point(-1, -1), 3);
+        Imgproc.threshold(mTthres, mTthres, average, 179.0, Imgproc.THRESH_BINARY);
+
+        mRgba.copyTo(foreground, mTthres);//copy only non zero values
+        return foreground;
+
+    }
+
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
-        // TODO Auto-generated method stub
         mRgba = inputFrame.rgba();
         //Canny detect
+        /*
         Imgproc.cvtColor(mRgba, mGray,Imgproc.COLOR_RGB2GRAY);
         Imgproc.blur(mGray, mGray, new Size(3,3));
         OpencvNativeClass.cannyDetect(mGray.getNativeObjAddr(), mCanny.getNativeObjAddr());
+        */
         //Background removal
         Imgproc.cvtColor(mRgba, mHSV,Imgproc.COLOR_BGR2HSV);
         List<Mat> hsvMat = new ArrayList<>();
@@ -172,19 +204,22 @@ public static void calcHist(java.util.List<Mat> images,
         }
         average = average / mHSV.size().height / mHSV.size().width;
         Imgproc.threshold(hsvMat.get(0), mTthres,average, 179.0, Imgproc.THRESH_BINARY );
+
         Imgproc.blur(mTthres, mTthres, new Size(5, 5));
         Imgproc.dilate(mTthres, mTthres, new Mat(), new Point(-1, -1), 1);
         Imgproc.erode(mTthres, mTthres, new Mat(), new Point(-1, -1), 3);
-        Imgproc.threshold(mTthres, mTthres, average, 179.0, Imgproc.THRESH_BINARY);
-        Mat foreground = new Mat(mRgba.size(), CvType.CV_8UC3, new Scalar(255, 255, 255));
-        mRgba.copyTo(foreground, mTthres);
+        //Imgproc.threshold(mTthres, mTthres, average, 179.0, Imgproc.THRESH_BINARY);
+        Imgproc.findContours(mTthres, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        //mRgba.copyTo(foreground, mTthres);
+        Imgproc.drawContours(mRgba,contours,-1, new Scalar(0,255,0),2);
+
 
         // Rotate mRgba 90 degrees
        // Core.transpose(mRgba, mRgbaT);
        // Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
         //Core.flip(mRgbaF, mRgba, 1 );
 
-        return foreground; // This function must return
+        return mRgba; // This function must return
     }
 
 }

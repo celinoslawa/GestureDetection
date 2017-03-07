@@ -9,6 +9,7 @@
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:id="@+id/show_camera_activity_java_surface_view"
+        opencv:show_fps="true"
         opencv:camera_id="any" />
 
 </LinearLayout>
