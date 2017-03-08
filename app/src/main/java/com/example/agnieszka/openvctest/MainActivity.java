@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mTthres;
     Mat foreground;
 
-    List<MatOfPoint> contours;
+    //List<MatOfPoint> contours;
 
 
     static{
@@ -137,14 +137,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         mCanny = new Mat(height,width, CvType.CV_8UC1);
         mTthres = new Mat(height,width, CvType.CV_8UC1);
         foreground = new Mat(mRgba.size(), CvType.CV_32SC1, new Scalar(255, 255, 255));
-        contours = new ArrayList<MatOfPoint>();
+
     }
 
     //destroy image data when you stop camera preview
     public void onCameraViewStopped() {
         mRgba.release();
     }
-
+/*
     public Mat backgroundRemove(Mat frame){
         Imgproc.cvtColor(frame, mHSV,Imgproc.COLOR_BGR2HSV);
         List<Mat> hsvMat = new ArrayList<>();
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         return foreground;
 
     }
+    */
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
@@ -186,20 +187,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         MatOfInt histRange = new MatOfInt(180);
         //hsvMat.get(0); //hue mat
         Imgproc.calcHist(hsvMat, new MatOfInt(0), new Mat(), mHist, histRange, new MatOfFloat(0, 179));
-/*
-public static void calcHist(java.util.List<Mat> images,
-                            MatOfInt channels,
-                            Mat mask,
-                            Mat hist,
-                            MatOfInt histSize,
-                            MatOfFloat ranges)
-
- */
-        double average = 0.0;
+        //compute average for threshold
+        average = 0.0;
         for (int h = 0; h < 180; h++)
         {
-            // for each bin, get its value and multiply it for the corresponding
-            // hue
             average += (mHist.get(h, 0)[0] * h);
         }
         average = average / mHSV.size().height / mHSV.size().width;
@@ -209,9 +200,17 @@ public static void calcHist(java.util.List<Mat> images,
         Imgproc.dilate(mTthres, mTthres, new Mat(), new Point(-1, -1), 1);
         Imgproc.erode(mTthres, mTthres, new Mat(), new Point(-1, -1), 3);
         //Imgproc.threshold(mTthres, mTthres, average, 179.0, Imgproc.THRESH_BINARY);
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(mTthres, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
         //mRgba.copyTo(foreground, mTthres);
-        Imgproc.drawContours(mRgba,contours,-1, new Scalar(0,255,0),2);
+        for(int i=0; i<contours.size(); i++)
+        {
+            if(Imgproc.contourArea(contours.get(i))>= 7000){
+                List<MatOfPoint> scontours = new ArrayList<MatOfPoint>();
+                scontours.add(contours.get(i));
+                Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
+            }
+        }
 
 
         // Rotate mRgba 90 degrees
