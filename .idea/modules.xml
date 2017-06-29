@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GestureDetection.iml" filepath="$PROJECT_DIR$/GestureDetection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Openvctest.iml" filepath="$PROJECT_DIR$/Openvctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" filepath="$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" />
     </modules>
