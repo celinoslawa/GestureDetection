@@ -42,7 +42,7 @@ public class ImProcessing {
     private static final String TAG = "ImProcessing";
     int width;
     int height;
-    /*wybranie 5 pkt które znajdją sie na rence
+    /*wybranie 7 pkt które znajdją sie na rence
 
                  a
                f   g
@@ -85,6 +85,7 @@ public class ImProcessing {
     double averageP;
     double[] pointColor = new double[4];
 
+
     public ImProcessing(int widthM, int heightM)
     {
         width = widthM;
@@ -106,40 +107,45 @@ public class ImProcessing {
         aY=aY-100;
         bX=bX +50;
         dX=dX-50;
-        //Log.v(TAG, "Point e = " + eY + " X " + eX);
+/*
         Log.v(TAG, "Point a = " + aY + " X " + aX);
         Log.v(TAG, "Point b = " + bY + " X " + bX);
         Log.v(TAG, "Point c = " + cY + " X " + cX);
         Log.v(TAG, "Point d = " + dY + " X " + dX);
+        Log.v(TAG, "Point e = " + eY + " X " + eX);
         Log.v(TAG, "Point f = " + fY + " X " + fX);
         Log.v(TAG, "Point g = " + gY + " X " + gX);
+*/
         pointColor[0]=255;
         pointColor[1]=0;
         pointColor[2]=0;
         pointColor[3]=0;
 
+
+
     }
 
 
 
-    Mat backgroungRemove(Mat mRgba, boolean calibration)
+    Mat backgroungRemove(Mat mRgba, MainActivity.AppStatusE status)
     {
         //Background removal
         Imgproc.cvtColor(mRgba, mHSV,Imgproc.COLOR_BGR2HSV);
         List<Mat> hsvMat = new ArrayList<>();
         Core.split(mHSV, hsvMat);
         a = mHSV.get(aX,aY);
-
         b = mHSV.get(bX,bY);
         c = mHSV.get(cX,cY);
         d = mHSV.get(dX,dY);
         e = mHSV.get(eX,eY);
         f = mHSV.get(fX,fY);
         g = mHSV.get(gX,gY);
-        if(calibration)
+
+        if(status == MainActivity.AppStatusE.CALIBRATION)
         {
             calibrationOfTreshold();
         }
+
         Core.inRange(mHSV, avLowerT, avUpperT, mTresh);
         Imgproc.blur(mTresh, mTresh, new Size(5, 5));
         Imgproc.dilate(mTresh, mTresh, new Mat(), new Point(-1, -1), 1);
@@ -155,6 +161,8 @@ public class ImProcessing {
                 Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
             }
         }
+        Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
+        Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
         /*MatOfInt histRange = new MatOfInt(180);
         //hsvMat.get(0); //hue mat
         Imgproc.calcHist(hsvMat, new MatOfInt(0), new Mat(), mHist, histRange, new MatOfFloat(0, 179));
@@ -185,7 +193,7 @@ public class ImProcessing {
                 Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
             }
         }*/
-        if(calibration)
+        if(status == MainActivity.AppStatusE.CALIBRATION)
         {
             Imgproc.rectangle(mRgba, new Point(aY - 5, aX - 5), new Point(aY + 5, aX + 5), new Scalar(0, 0, 0));
             Imgproc.rectangle(mRgba, new Point(bY - 5, bX - 5), new Point(bY + 5, bX + 5), new Scalar(0, 0, 0));
@@ -209,8 +217,6 @@ public class ImProcessing {
         double[] upper = new double[3];
         double[] lower = new double[3];
 
-
-        //Log.v(TAG, "AverageT = " + this.averageT[2]);
         for(int i=0; i < 3; i++)
         {
             values.add(this.a[i]);
@@ -223,13 +229,13 @@ public class ImProcessing {
             Collections.sort(values);
             lower[i] = values.get(0);
             upper[i] = values.get(6);
-            Log.v(TAG, "A = " + this.a[i] + "   B = " + this.b[i] + "   C = " + this.c[i] + "   D = " + this.d[i] + "   E = " + this.e[i] + "   F = " + this.f[i] + "   G = " + this.g[i] );
+//            Log.v(TAG, "A = " + this.a[i] + "   B = " + this.b[i] + "   C = " + this.c[i] + "   D = " + this.d[i] + "   E = " + this.e[i] + "   F = " + this.f[i] + "   G = " + this.g[i] );
             values.clear();
         }
         this.avUpperT = new Scalar(upper[0] + 20, upper[1] + 20, 255);
         this.avLowerT = new Scalar(lower[0], lower[1], 0);
-        Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
-        Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
+        //Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
+        //Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
 
     }
 
