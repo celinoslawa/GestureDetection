@@ -150,7 +150,8 @@ public class ImProcessing {
         Imgproc.blur(mTresh, mTresh, new Size(5, 5));
         Imgproc.dilate(mTresh, mTresh, new Mat(), new Point(-1, -1), 1);
         Imgproc.erode(mTresh, mTresh, new Mat(), new Point(-1, -1), 3);
-        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+
+        /*List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(mTresh, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
         //mRgba.copyTo(foreground, mTthres);
         for(int i=0; i<contours.size(); i++)
@@ -160,7 +161,7 @@ public class ImProcessing {
                 scontours.add(contours.get(i));
                 Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
             }
-        }
+        }*/
         Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
         Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
         /*MatOfInt histRange = new MatOfInt(180);
@@ -193,8 +194,9 @@ public class ImProcessing {
                 Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
             }
         }*/
-        if(status == MainActivity.AppStatusE.CALIBRATION)
+        /* if(status == MainActivity.AppStatusE.CALIBRATION)
         {
+
             Imgproc.rectangle(mRgba, new Point(aY - 5, aX - 5), new Point(aY + 5, aX + 5), new Scalar(0, 0, 0));
             Imgproc.rectangle(mRgba, new Point(bY - 5, bX - 5), new Point(bY + 5, bX + 5), new Scalar(0, 0, 0));
             Imgproc.rectangle(mRgba, new Point(cY - 5, cX - 5), new Point(cY + 5, cX + 5), new Scalar(0, 0, 0));
@@ -207,8 +209,43 @@ public class ImProcessing {
             mRgba.put(cY, cX, pointColor);
             mRgba.put(dY, dX, pointColor);
             mRgba.put(eY, eX, pointColor);
+           // mTresh = drawCalibrationPoints(mTresh);
+
+        }*/
+        return mTresh;
+    }
+
+    Mat drawContours(Mat mRgba, Mat mask)
+    {
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        //mRgba.copyTo(foreground, mTthres);
+        for(int i=0; i<contours.size(); i++)
+        {
+            if(Imgproc.contourArea(contours.get(i))>= 7000){
+                List<MatOfPoint> scontours = new ArrayList<MatOfPoint>();
+                scontours.add(contours.get(i));
+                Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
+            }
         }
         return mRgba;
+    }
+
+    Mat drawCalibrationPoints(Mat frame)
+    {
+        Imgproc.rectangle(frame, new Point(aY - 5, aX - 5), new Point(aY + 5, aX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(bY - 5, bX - 5), new Point(bY + 5, bX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(cY - 5, cX - 5), new Point(cY + 5, cX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(dY - 5, dX - 5), new Point(dY + 5, dX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(eY - 5, eX - 5), new Point(eY + 5, eX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(fY - 5, fX - 5), new Point(fY + 5, fX + 5), new Scalar(0, 0, 0));
+        Imgproc.rectangle(frame, new Point(gY - 5, gX - 5), new Point(gY + 5, gX + 5), new Scalar(0, 0, 0));
+        frame.put(aY, aX, pointColor);
+        frame.put(bY, bX, pointColor);
+        frame.put(cY, cX, pointColor);
+        frame.put(dY, dX, pointColor);
+        frame.put(eY, eX, pointColor);
+        return frame;
     }
 
     void calibrationOfTreshold()

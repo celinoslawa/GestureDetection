@@ -19,6 +19,9 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.ml.SVM;
+
+import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
 
@@ -38,10 +41,14 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     }
 
     private ImProcessing imProc;
+    private HogDescriptor hog;
     private CountDownTimer countDownTimer;
     private TextView textViewTime;
     private AppStatusE appStatus;
+    SVM svm;
     Mat mRgba;
+    Mat mMask;
+    String filename;
 
 
 
@@ -88,7 +95,11 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         textViewTime = (TextView) findViewById(R.id.textViewTime);
 
-        appStatus = AppStatusE.CALIBRATION;
+        appStatus = CALIBRATION;
+
+        svm = new SVM();
+
+        svm.load(filename);
 
     }
 
@@ -165,11 +176,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
     //receive Image data when the camera preview starts
     public void onCameraViewStarted(int width, int height) {
-        appStatus = AppStatusE.CALIBRATION;
+        appStatus = CALIBRATION;
         startCountDownTimer();
 
         mRgba = new Mat(height, width, CvType.CV_8UC4);
+        mMask = new Mat(height, width, CvType.CV_8SC1);
         imProc = new ImProcessing(height,width);
+        hog = new HogDescriptor();
 
     }
 
@@ -181,7 +194,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
         mRgba = inputFrame.rgba();
-        return imProc.backgroungRemove(mRgba, appStatus);
+        mMask = imProc.backgroungRemove(mRgba, appStatus);
+
+        if(appStatus == CALIBRATION ){
+            mRgba = imProc.drawCalibrationPoints(mRgba);
+        }
+        else {
+            hog.compute(mMask);
+            //HOG + SVM
+        }
+        mRgba = imProc.drawContours(mRgba,mMask);
+        return mRgba;
     }
 
 }
