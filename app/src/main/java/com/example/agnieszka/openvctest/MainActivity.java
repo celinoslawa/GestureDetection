@@ -19,7 +19,11 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.ml.SVM;
+import org.opencv.objdetect.HOGDescriptor;
 
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     // Used for logging success or failure messages
     private static final String TAG = "OCVSample::Activity";
     private static final String TAT = "CountDownTimer::Activity";
+    private static final String SVM = "SVM : ";
 
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
     private CameraBridgeViewBase mOpenCvCameraView;
@@ -45,10 +50,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private CountDownTimer countDownTimer;
     private TextView textViewTime;
     private AppStatusE appStatus;
-    SVM svm;
+    protected SVM svm;
     Mat mRgba;
     Mat mMask;
     String filename;
+    float resp;
+    long addr;
 
 
 
@@ -97,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         appStatus = CALIBRATION;
 
-        svm = new SVM();
+        //svm = new SVM(addr);
+       // svm.create();
 
-        svm.load(filename);
+        //svm.load(filename);
 
     }
 
@@ -201,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
         else {
             hog.compute(mMask);
+            //resp = svm.predict(hog.getDescriptors());
+            //Log.v(SVM, "Predicted value : " + resp);
             //HOG + SVM
         }
         mRgba = imProc.drawContours(mRgba,mMask);

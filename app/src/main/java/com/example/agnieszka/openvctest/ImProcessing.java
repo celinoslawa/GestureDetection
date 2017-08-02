@@ -151,6 +151,7 @@ public class ImProcessing {
         Imgproc.dilate(mTresh, mTresh, new Mat(), new Point(-1, -1), 1);
         Imgproc.erode(mTresh, mTresh, new Mat(), new Point(-1, -1), 3);
 
+
         /*List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(mTresh, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
         //mRgba.copyTo(foreground, mTthres);
@@ -164,6 +165,7 @@ public class ImProcessing {
         }*/
         Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
         Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
+        return mTresh;
         /*MatOfInt histRange = new MatOfInt(180);
         //hsvMat.get(0); //hue mat
         Imgproc.calcHist(hsvMat, new MatOfInt(0), new Mat(), mHist, histRange, new MatOfFloat(0, 179));
@@ -212,7 +214,7 @@ public class ImProcessing {
            // mTresh = drawCalibrationPoints(mTresh);
 
         }*/
-        return mTresh;
+
     }
 
     Mat drawContours(Mat mRgba, Mat mask)
