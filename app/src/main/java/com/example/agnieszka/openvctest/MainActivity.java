@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mMask;
     String filename;
     float resp;
-    long addr;
+    long addr = '';
 
 
 
@@ -104,10 +104,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         appStatus = CALIBRATION;
 
-        //svm = new SVM(addr);
-       // svm.create();
+        svm = new SVM(addr);
+        svm.create();
 
-        //svm.load(filename);
+        svm.load(filename);
 
     }
 

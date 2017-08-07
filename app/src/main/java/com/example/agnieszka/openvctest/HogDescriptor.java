@@ -16,7 +16,7 @@ import org.opencv.objdetect.HOGDescriptor;
 
 public class HogDescriptor {
     private static final String TAG = "HogDescriptor";
-    HOGDescriptor Hog;
+    HOGDescriptor Hog; // = new HOGDescriptor() ;
     Size winSize = new Size(60, 100);
     Size blockSize = new Size(40, 40);
     Size blockStride = new Size(20, 20);
@@ -28,20 +28,26 @@ public class HogDescriptor {
     double L2HysThreshold = 0.2;
     boolean gammaCorrection = true;
     int nlevels = 64;
-    MatOfFloat descriptors;
+    boolean signedGradient = true;
+    MatOfFloat descriptors = new MatOfFloat();
     Mat frameB = new Mat();
 
 
     public HogDescriptor()
     {
-        Hog = new HOGDescriptor(new org.opencv.core.Size(60, 100),new org.opencv.core.Size(40, 40), new org.opencv.core.Size(20, 20),new org.opencv.core.Size(10, 10), nbins, derivAperture,
-                winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels);
+        //Size _winSize, Size _blockSize, Size _blockStride, Size _cellSize, int _nbins, int _derivAperture, double _winSigma, int _histogramNormType, double _L2HysThreshold, boolean _gammaCorrection, int _nlevels, boolean _signedGradient
+       Hog = new HOGDescriptor(winSize ,blockSize,blockStride ,cellSize, nbins, derivAperture,
+               winSigma, histogramNormType, L2HysThreshold, gammaCorrection, nlevels, signedGradient);
     }
 
     void compute(Mat frame)
     {
         Imgproc.resize(frame, frameB, winSize,1,1, Imgproc.INTER_AREA);
-        Hog.compute(frameB, descriptors);
+       // Imgproc.blur(frameB, frameB, new Size(5, 5));
+        Hog.compute(frameB,descriptors);
+        //Log.v(TAG, "DESCRIPTORS: " + descriptors);
+
+       // Hog.compute(frameB, descriptors);
     }
 
 
