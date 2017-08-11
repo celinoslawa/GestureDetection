@@ -1,6 +1,7 @@
 package com.example.agnieszka.openvctest;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.util.Log;
@@ -24,6 +25,9 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.ml.SVM;
 import org.opencv.objdetect.HOGDescriptor;
+
+import java.io.File;
+import java.io.InputStream;
 
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
 
@@ -50,12 +54,17 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private CountDownTimer countDownTimer;
     private TextView textViewTime;
     private AppStatusE appStatus;
-    protected SVM svm;
+    SVM svm = org.opencv.ml.SVM.create();
+    //public SVM self = new SVM();
+    //SVM svm = new SVM();
+    //SVM svm = SVM.create();
     Mat mRgba;
     Mat mMask;
-    String filename;
+    //String filename = "/app/src/main/res/SVM/digits_svm.dat";
+    //InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
+    //File datasetFile = new File(Environment.getExternalStorageDirectory(), "digits_svm.dat");
     float resp;
-    long addr = '';
+    //long addr = '';
 
 
 
@@ -104,10 +113,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         appStatus = CALIBRATION;
 
-        svm = new SVM(addr);
-        svm.create();
+        //svm = new SVM(addr);
+        //SVM svm = org.opencv.ml.SVM.create();
+        InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
+        //svm.create();
 
-        svm.load(filename);
+        svm.load(String.valueOf(is));
 
     }
 
@@ -209,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
         else {
             hog.compute(mMask);
-            //resp = svm.predict(hog.getDescriptors());
-            //Log.v(SVM, "Predicted value : " + resp);
+            resp = svm.predict(hog.getDescriptors());
+            Log.v(SVM, "Predicted value : " + resp);
             //HOG + SVM
         }
         mRgba = imProc.drawContours(mRgba,mMask);
