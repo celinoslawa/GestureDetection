@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     //SVM svm = SVM.create();
     Mat mRgba;
     Mat mMask;
+    InputStream responsesJSON = getResources().openRawResource(R.raw.responses);
+    InputStream hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
+    public JsonReader json;
     //String filename = "/app/src/main/res/SVM/digits_svm.dat";
     //InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
     //File datasetFile = new File(Environment.getExternalStorageDirectory(), "digits_svm.dat");
@@ -112,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         textViewTime = (TextView) findViewById(R.id.textViewTime);
 
         appStatus = CALIBRATION;
+        json = new JsonReader(responsesJSON,hog_descriptorsJSON );
 
         //svm = new SVM(addr);
         //SVM svm = org.opencv.ml.SVM.create();
