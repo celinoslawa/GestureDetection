@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -26,7 +27,9 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.ml.SVM;
 import org.opencv.objdetect.HOGDescriptor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
@@ -62,6 +65,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mMask;
     InputStream responsesJSON = getResources().openRawResource(R.raw.responses);
     InputStream hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
+    ByteArrayOutputStream byteArrayOutputStreamRES = new ByteArrayOutputStream();
+    ByteArrayOutputStream byteArrayOutputStreamHOG = new ByteArrayOutputStream();
+
+
     public JsonReader json;
     //String filename = "/app/src/main/res/SVM/digits_svm.dat";
     //InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
@@ -115,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         textViewTime = (TextView) findViewById(R.id.textViewTime);
 
         appStatus = CALIBRATION;
+
         json = new JsonReader(responsesJSON,hog_descriptorsJSON );
 
         //svm = new SVM(addr);
