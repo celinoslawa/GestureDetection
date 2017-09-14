@@ -31,8 +31,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
+import static org.opencv.ml.Ml.COL_SAMPLE;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
 
@@ -63,18 +66,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     //SVM svm = SVM.create();
     Mat mRgba;
     Mat mMask;
-    InputStream responsesJSON = getResources().openRawResource(R.raw.responses);
-    InputStream hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
-    ByteArrayOutputStream byteArrayOutputStreamRES = new ByteArrayOutputStream();
-    ByteArrayOutputStream byteArrayOutputStreamHOG = new ByteArrayOutputStream();
-
-
+    InputStream responsesJSON;// = getResources().openRawResource(R.raw.responses);
+    InputStream hog_descriptorsJSON;// = getResources().openRawResource(R.raw.hog_descriptors);
     public JsonReader json;
-    //String filename = "/app/src/main/res/SVM/digits_svm.dat";
-    //InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
-    //File datasetFile = new File(Environment.getExternalStorageDirectory(), "digits_svm.dat");
     float resp;
-    //long addr = '';
 
 
 
@@ -123,14 +118,18 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         appStatus = CALIBRATION;
 
-        json = new JsonReader(responsesJSON,hog_descriptorsJSON );
+        responsesJSON = getResources().openRawResource(R.raw.responses);
+        hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
 
-        //svm = new SVM(addr);
-        //SVM svm = org.opencv.ml.SVM.create();
-        InputStream is = this.getResources().openRawResource(+R.drawable.digits_svm);
-        //svm.create();
+        json = new JsonReader(responsesJSON, hog_descriptorsJSON );
+        json.parsing();
 
-        svm.load(String.valueOf(is));
+        svm.setGamma(0.50625);
+        svm.setC(12.5);
+        svm.setType(org.opencv.ml.SVM.C_SVC);
+        svm.setKernel(org.opencv.ml.SVM.RBF);
+        svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
+        //svm.train(hogList, respList);*/
 
     }
 
