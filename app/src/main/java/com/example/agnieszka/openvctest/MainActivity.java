@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     Mat mMask;
     InputStream responsesJSON;// = getResources().openRawResource(R.raw.responses);
     InputStream hog_descriptorsJSON;// = getResources().openRawResource(R.raw.hog_descriptors);
-    public JsonReader json;
+    public JsonR json;
     float resp;
 
 
@@ -121,14 +121,18 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         responsesJSON = getResources().openRawResource(R.raw.responses);
         hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
 
-        json = new JsonReader(responsesJSON, hog_descriptorsJSON );
-        json.parsing();
+        json = new JsonR(responsesJSON, hog_descriptorsJSON );
+        try {
+            json.parsing();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         svm.setGamma(0.50625);
         svm.setC(12.5);
         svm.setType(org.opencv.ml.SVM.C_SVC);
         svm.setKernel(org.opencv.ml.SVM.RBF);
-        svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
+        //svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
         //svm.train(hogList, respList);*/
 
     }
