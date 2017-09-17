@@ -127,11 +127,15 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         } catch (IOException e) {
             e.printStackTrace();
         }
+        json.convertToMat();
+        Log.i(SVM, " starting SVM training");
+
 
         svm.setGamma(0.50625);
         svm.setC(12.5);
         svm.setType(org.opencv.ml.SVM.C_SVC);
         svm.setKernel(org.opencv.ml.SVM.RBF);
+        svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
         //svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
         //svm.train(hogList, respList);*/
 

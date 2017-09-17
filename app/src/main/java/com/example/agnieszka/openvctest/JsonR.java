@@ -61,41 +61,95 @@ public class JsonR {
             while (responsesReader.hasNext())
             {
                 respElement = responsesReader.nextInt();
+                //Log.v(TAG,"responsesReader.nextInt() = " + responsesReader.nextInt());
+                //Log.v(TAG,"respElement = " + respElement);
                 respElementList.add(respElement);
             }
+            responsesReader.endArray();
+            //Log.v(TAG,"respElementList = " + respElementList.get(0));
             respList.add(respElementList);
+            respElementList.clear();
         }
         responsesReader.endArray();
 
         hogReader.beginArray();
         while(hogReader.hasNext())
         {
+            hogElementList.clear();
             hogReader.beginArray();
             while (hogReader.hasNext())
             {
                 hogElement = hogReader.nextDouble();
                 hogElementList.add(hogElement);
+                //Log.v(TAG,"hogElement = " + hogElement);
             }
+            hogReader.endArray();
+           // Log.v(TAG,"hogElementList = " + hogElementList.get(1));
             hogList.add(hogElementList);
         }
         hogReader.endArray();
+        //****DEBUG****
+        //Log.v(TAG,"Last one respElement: " + respElement);
+        //Log.v(TAG,"Element from  hogElementList: " + hogElementList.get(1));
+        //Log.v(TAG,"hogList = " + hogList.get(1));
+
 
     }
 
     void convertToMat()
     {
+        Log.v(TAG,"Parsing JSON ------ convert To MAt");
         hogMat = new Mat(hogElementList.size(), hogList.size(), CvType.CV_32FC1);
-        responsesMat = new Mat(jArrayRES.getJSONArray(0).length(),jArrayRES.length(), CvType.CV_8SC1);
+        responsesMat = new Mat(respElementList.size(),respList.size(), CvType.CV_32S);
+        hogElementList.clear();
+
         for (int i = 0; i < hogList.size(); i++)
         {
+            hogElementList.clear();
+            hogElementList = hogList.get(i);
+           // Log.v(TAG,"Element from  hogList: " + hogList.get(i));
             for (int j = 0; j < hogElementList.size(); j++)
             {
-
-                hogMat.put(i,j, hogList.get(i));
+                hogMat.put(i,j, hogElementList.get(j));
+            //    Log.v(TAG,"Element from  hogElementList: " + hogElementList.get(j));
 
             }
         }
 
+       // Log.v(TAG,"Get element form hogMAt: " + hogMat.get(1,1));
+
+
+        for (int g = 0; g < respList.size(); g++)
+        {
+            //Log.v(TAG,"Parsing JSON ------ convert resp To MAt");
+            respElementList.clear();
+            respElementList = respList.get(g);
+            for(int h = 0; h < respElementList.size(); h++)
+            {
+                Log.v(TAG,"Parsing JSON ------ convert resp To MAt II   ");
+            }
+
+        }
+/*
+            for (int h = 0; h < respElementList.size(); h++)
+            {
+                Log.v(TAG,"Parsing JSON ------ convert resp To MAt II   ");
+                respElement = respElementList.get(h);
+                responsesMat.put(g,h, respElement);
+                Log.v(TAG,"RespElementList: " + respElementList.get(h));
+
+            }
+ */
+    }
+
+    Mat getHogMat()
+    {
+        return hogMat;
+    }
+
+    Mat getResponsesMat()
+    {
+        return responsesMat;
     }
 
 
