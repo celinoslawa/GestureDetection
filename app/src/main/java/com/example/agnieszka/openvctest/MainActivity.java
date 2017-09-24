@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         svm.setC(12.5);
         svm.setType(org.opencv.ml.SVM.C_SVC);
         svm.setKernel(org.opencv.ml.SVM.RBF);
+        //svm.train(json.traindata());
         svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
         //svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
         //svm.train(hogList, respList);*/

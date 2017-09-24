@@ -6,6 +6,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.ml.TrainData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.opencv.ml.Ml.COL_SAMPLE;
 
 /**
  * Created by agnieszka on 15.09.17.
@@ -117,18 +120,17 @@ public class JsonR {
         }
 
        // Log.v(TAG,"Get element form hogMAt: " + hogMat.get(1,1));
-
-
-        for (int g = 0; g < respList.size(); g++)
+        int k = 0;
+        for(int h = 0; h < 1240; h++)
         {
-            //Log.v(TAG,"Parsing JSON ------ convert resp To MAt");
-            respElementList.clear();
-            respElementList = respList.get(g);
-            for(int h = 0; h < respElementList.size(); h++)
+            if(h%124 == 0 && h>0)
             {
-                Log.v(TAG,"Parsing JSON ------ convert resp To MAt II   ");
+                k += 1;
+                // k -= 1;
             }
+            responsesMat.put(0,h, k);
 
+            //Log.v(TAG,"Parsing JSON ------ convert resp To MAt II   k = " + k);
         }
 /*
             for (int h = 0; h < respElementList.size(); h++)
@@ -140,6 +142,12 @@ public class JsonR {
 
             }
  */
+    }
+
+    TrainData traindata()
+    {
+        TrainData traineddata = TrainData.create(hogMat, COL_SAMPLE,responsesMat);
+        return traineddata;
     }
 
     Mat getHogMat()
