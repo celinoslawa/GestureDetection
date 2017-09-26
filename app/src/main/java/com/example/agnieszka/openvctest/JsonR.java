@@ -103,7 +103,7 @@ public class JsonR {
     {
         Log.v(TAG,"Parsing JSON ------ convert To MAt");
         hogMat = new Mat(hogElementList.size(), hogList.size(), CvType.CV_32FC1);
-        responsesMat = new Mat(respElementList.size(),respList.size(), CvType.CV_32S);
+        responsesMat = new Mat(1,1240, CvType.CV_32S);
         hogElementList.clear();
 
         for (int i = 0; i < hogList.size(); i++)
