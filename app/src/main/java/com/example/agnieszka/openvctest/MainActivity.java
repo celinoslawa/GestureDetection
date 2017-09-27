@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             descriptors = hog.getDescriptors();
             Log.v(SVM, "Descriptors : " + descriptors);
             Log.v(SVM, "getVarCount : " + svm.getVarCount());
-            resp = svm.predict(descriptors);
+            resp = svm.predict(descriptors.reshape(1, 1));
             Log.v(SVM, "Predicted value : " + resp);
             //HOG + SVM
         }
