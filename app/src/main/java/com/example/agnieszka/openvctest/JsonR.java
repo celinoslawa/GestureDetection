@@ -6,6 +6,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
 import org.opencv.ml.TrainData;
 
 import java.io.BufferedReader;
@@ -118,6 +119,7 @@ public class JsonR {
 
             }
         }
+        Log.v(TAG, "Read from Json: DESCRIPTORS: width: " + hogMat.width()+ "  height: " + hogMat.height() );
 
        // Log.v(TAG,"Get element form hogMAt: " + hogMat.get(1,1));
         int k = 0;
@@ -152,6 +154,7 @@ public class JsonR {
 
     Mat getHogMat()
     {
+        Log.v(TAG,"HOG MAT from Json: " +hogMat );
         return hogMat;
     }
 

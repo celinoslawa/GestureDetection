@@ -163,8 +163,8 @@ public class ImProcessing {
                 Imgproc.drawContours(mRgba,scontours,-1, new Scalar(255,0,0),5);
             }
         }*/
-        Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
-        Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
+       // Log.v(TAG, "Upper value for H=" + avUpperT.val[0] + "   S=" + avUpperT.val[1] + "  V=" + avUpperT.val[2]);
+        //Log.v(TAG, "Lower value for H=" + avLowerT.val[0] + "   S=" + avLowerT.val[1] + "  V=" + avLowerT.val[2]);
         return mTresh;
         /*MatOfInt histRange = new MatOfInt(180);
         //hsvMat.get(0); //hue mat

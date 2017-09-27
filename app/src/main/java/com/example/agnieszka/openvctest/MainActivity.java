@@ -36,6 +36,7 @@ import java.util.List;
 
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
 import static org.opencv.ml.Ml.COL_SAMPLE;
+import static org.opencv.ml.Ml.ROW_SAMPLE;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
 
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     //SVM svm = SVM.create();
     Mat mRgba;
     Mat mMask;
+    Mat descriptors;
     InputStream responsesJSON;// = getResources().openRawResource(R.raw.responses);
     InputStream hog_descriptorsJSON;// = getResources().openRawResource(R.raw.hog_descriptors);
     public JsonR json;
@@ -135,9 +137,10 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         svm.setC(12.5);
         svm.setType(org.opencv.ml.SVM.C_SVC);
         svm.setKernel(org.opencv.ml.SVM.RBF);
+
         //svm.train(json.traindata());
         svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
-        //svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
+       // svm.train(json.getHogMat(),ROW_SAMPLE, json.getResponsesMat());
         //svm.train(hogList, respList);*/
 
     }
@@ -220,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mMask = new Mat(height, width, CvType.CV_8SC1);
+        descriptors = new Mat(1, 1152, CvType.CV_32F);
         imProc = new ImProcessing(height,width);
         hog = new HogDescriptor();
 
@@ -239,8 +243,13 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             mRgba = imProc.drawCalibrationPoints(mRgba);
         }
         else {
+            Log.i(SVM, " ================ PREDICTION ===================");
+
             hog.compute(mMask);
-            resp = svm.predict(hog.getDescriptors());
+            descriptors = hog.getDescriptors();
+            Log.v(SVM, "Descriptors : " + descriptors);
+            Log.v(SVM, "getVarCount : " + svm.getVarCount());
+            resp = svm.predict(descriptors);
             Log.v(SVM, "Predicted value : " + resp);
             //HOG + SVM
         }
