@@ -24,6 +24,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.ml.KNearest;
 import org.opencv.ml.SVM;
 import org.opencv.objdetect.HOGDescriptor;
 
@@ -37,13 +38,15 @@ import java.util.List;
 import static com.example.agnieszka.openvctest.MainActivity.AppStatusE.CALIBRATION;
 import static org.opencv.ml.Ml.COL_SAMPLE;
 import static org.opencv.ml.Ml.ROW_SAMPLE;
+import static org.opencv.ml.SVM.C_SVC;
+import static org.opencv.ml.SVM.LINEAR;
 
 public class MainActivity extends AppCompatActivity implements CvCameraViewListener2 {
 
     // Used for logging success or failure messages
     private static final String TAG = "OCVSample::Activity";
     private static final String TAT = "CountDownTimer::Activity";
-    private static final String SVM = "SVM : ";
+    private static final String SVMlog = "SVM : ";
 
     // Loads camera view of OpenCV for us to use. This lets us see using OpenCV
     private CameraBridgeViewBase mOpenCvCameraView;
@@ -61,13 +64,19 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     private CountDownTimer countDownTimer;
     private TextView textViewTime;
     private AppStatusE appStatus;
-    SVM svm = org.opencv.ml.SVM.create();
+    //KNN
+    //KNearest knn = KNearest.create();
+    //SVM
+    SVM svm = SVM.create();
+
+    //SVM svm = org.opencv.ml.SVM.create();
     //public SVM self = new SVM();
     //SVM svm = new SVM();
     //SVM svm = SVM.create();
     Mat mRgba;
     Mat mMask;
     Mat descriptors;
+    Mat result;
     InputStream responsesJSON;// = getResources().openRawResource(R.raw.responses);
     InputStream hog_descriptorsJSON;// = getResources().openRawResource(R.raw.hog_descriptors);
     public JsonR json;
@@ -85,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                 {
-                    Log.i(TAG, "OpenCV loaded successfully");
+                    Log.i(TAG, "================ OpenCV loaded successfully ================");
                     mOpenCvCameraView.enableView();
                 } break;
                 default:
@@ -120,6 +129,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
         appStatus = CALIBRATION;
 
+        ////////////////////////////////////////////////
+
         responsesJSON = getResources().openRawResource(R.raw.responses);
         hog_descriptorsJSON = getResources().openRawResource(R.raw.hog_descriptors);
 
@@ -130,18 +141,20 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             e.printStackTrace();
         }
         json.convertToMat();
-        Log.i(SVM, " starting SVM training");
 
+        Log.i(SVMlog, " ================ starting SVM training ================");
 
         svm.setGamma(0.50625);
         svm.setC(12.5);
-        svm.setType(org.opencv.ml.SVM.C_SVC);
-        svm.setKernel(org.opencv.ml.SVM.RBF);
+        svm.setType(C_SVC);
+        // svm.setKernel(org.opencv.ml.SVM.RBF);
+        svm.setKernel(LINEAR);
 
         //svm.train(json.traindata());
         svm.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
-       // svm.train(json.getHogMat(),ROW_SAMPLE, json.getResponsesMat());
-        //svm.train(hogList, respList);*/
+        //knn.train(json.getHogMat(),COL_SAMPLE, json.getResponsesMat());
+
+        ///////////////////////////////////////////////////////
 
     }
 
@@ -171,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             public void onFinish() {
 
                 textViewTime.setText("0");
-                Log.v(TAT, "onFinish");
+                Log.v(TAT, "============ on Finish, DETECTION started ==================");
                 appStatus = AppStatusE.DETECTION;
             }
 
@@ -218,13 +231,16 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
     //receive Image data when the camera preview starts
     public void onCameraViewStarted(int width, int height) {
+        Log.d(TAG, "================ ON CAMERA VIEW STARTED ================");
         appStatus = CALIBRATION;
+
         startCountDownTimer();
 
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mMask = new Mat(height, width, CvType.CV_8SC1);
         descriptors = new Mat(1, 1152, CvType.CV_32F);
         imProc = new ImProcessing(height,width);
+        result = new Mat();
         hog = new HogDescriptor();
 
     }
@@ -243,14 +259,18 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
             mRgba = imProc.drawCalibrationPoints(mRgba);
         }
         else {
-            Log.i(SVM, " ================ PREDICTION ===================");
+            Log.i(SVMlog, " ================ PREDICTION ===================");
 
             hog.compute(mMask);
             descriptors = hog.getDescriptors();
-            Log.v(SVM, "Descriptors : " + descriptors);
-            Log.v(SVM, "getVarCount : " + svm.getVarCount());
+            Log.v(SVMlog, "Descriptors : " + descriptors);
+            Log.v(SVMlog, "getVarCount : " + svm.getVarCount());
+            //Log.v(SVMlog, "getVarCount KNN : " + knn.getVarCount());
+           // resp = knn.findNearest(descriptors.reshape(1, 1), 1,result);
             resp = svm.predict(descriptors.reshape(1, 1));
-            Log.v(SVM, "Predicted value : " + resp);
+            Log.v(SVMlog, "Predicted value : " + resp);
+            //Log.v(SVMlog, "Predicted value KNN: " + resp);
+            //Log.v(SVMlog, "RESULT MAT KNN: " +result + "     " + result.dump());
             //HOG + SVM
         }
         mRgba = imProc.drawContours(mRgba,mMask);
